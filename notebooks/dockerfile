@@ -1,0 +1,31 @@
+FROM ubuntu:18.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir src
+WORKDIR src/
+COPY . .
+
+RUN apt-get -qq update && apt-get -qq update
+RUN apt-get -qq install wget unzip
+RUN apt-get -qq install git
+RUN apt-get -qq install time
+
+RUN wget -q -c https://repo.continuum.io/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh
+RUN chmod +x Miniconda3-py38_4.9.2-Linux-x86_64.sh
+RUN bash ./Miniconda3-py38_4.9.2-Linux-x86_64.sh -b -f -p /usr/local
+RUN rm Miniconda3-py38_4.9.2-Linux-x86_64.sh
+
+RUN pip3 -q install jupyter jupyterlab
+RUN pip3 -q install numpy matplotlib
+RUN pip3 -q install torch 
+RUN pip3 -q install torch_geometric
+RUN pip3 -q install sklearn
+
+RUN conda install -q -y -c bioconda biopython
+RUN conda install -q -y -c conda-forge rdkit openbabel seaborn
+RUN conda install -q -y -c bioconda autodock-vina 
+
+RUN apt-get -qq install openbabel
+
+CMD ["jupyter", "lab", "--allow-root", "--no-browser", "--ip=0.0.0.0", "--port=8888", "--NotebookApp.notebook_dir=/src"]
